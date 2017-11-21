@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>find-the-pair</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div>
+    <header>
+        <div class="header">
+            <div class="header_logo">
+                <h2 class="header_logo_text">Puzzle</h2>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+        <div id="puzzle" class="puzzle">
+        </div>
+        <div class="menu">
+            <form onsubmit="return false;">
+                <p>Укажите цвет фона:
+                    <br/>
+                    <label>
+                        <input type="color" name="color" id="color" value="#660000">
+                    </label>
+                    <input id="submitColor" type="submit" value="Выбрать">
+                </p>
+            </form>
+            <label>
+                <select id="select_field">
+                    <option>6 Pairs</option>
+                    <option>8 Pairs</option>
+                    <option>10 Pairs</option>
+                    <option>12 Pairs</option>
+                </select>
+            </label>
+        </div>
+    </div>
+</div>
+
+<script src="js/index.js"></script>
+</body>
+</html>

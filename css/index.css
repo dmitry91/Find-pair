@@ -1,0 +1,78 @@
+.header{
+    border-radius: 5px;
+    background: #3399cc;
+    height: 50px;
+    position: relative;
+    margin: 0 80px;
+}
+.header_logo{
+    position: absolute;
+    text-align: center;
+    background: #2e80ae;
+    border-radius: 3px;
+    height: 70%;
+    top: 15%;
+    left: 20px;
+    width: 200px;
+}
+.header_logo_text{
+   display: inline;
+   position: relative;
+   top: 5px;
+}
+.content{
+    width: 1000px;
+    height: 700px;
+    margin: 20px auto;
+
+}
+.puzzle{
+    border: 6px solid #c3c3c3;
+    width: 640px;
+    overflow: hidden;
+    float: left;
+    padding: 6px;
+    border-radius: 12px;
+}
+.content_card{
+    position: relative;
+    float: left;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+
+.block {
+    width: 100%;
+    height: 100%;
+    -webkit-transform-style: preserve-3d;
+    -webkit-transition: -webkit-transform 1.5s;
+}
+.rotated{
+    -webkit-transform: rotateY(180deg);
+}
+.side{
+    left: 1px;
+    right: 1px;
+    top: 1px;
+    bottom: 1px;
+    border: 2px solid #f96;
+    border-radius: 8px;
+    position: absolute;
+    -webkit-backface-visibility: hidden;
+}
+.front{
+}
+.back{
+    background-color: #f3f3f3;
+    -webkit-transform: rotateY(180deg);
+}
+.content_hidden_card{
+    border: 1px solid white;
+}
+.menu{
+    border: 1px solid gray;
+    width: 250px;
+    height: 500px;
+    float: right;
+}
