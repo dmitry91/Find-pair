@@ -1,5 +1,28 @@
 /*      model       */
-let model = {};
+let model = {
+    getArrayImages: function (l) {
+        let files = ["chamomile.jpg", "dandelion.JPG", "eiffel_tower.jpg", "hare.jpg", "horse.jpg", "house.jpg",
+            "lavra.jpg", "motorcycle.jpg", "ocean.jpg", "rottweiler.jpg", "sunset.jpg", "tesla.jpg"];
+
+        let result = shuffle(files);
+        //separate the desired number of pictures
+        result = result.slice(0, l / 2);
+        //create pairs
+        result = result.concat(result);
+        //shuffle again
+        result = shuffle(result);
+        return result;
+
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+    },
+
+};
 
 /*      view        */
 let view = {
@@ -20,6 +43,27 @@ let view = {
             puzzle.appendChild(contentCard);
         }
     },
+    startGame: function () {
+        let puzzle = document.getElementById('puzzle');
+        //show all the pictures and then hide
+        openAllCards();
+        setTimeout(closeAllCards, 1500);
+        controller.setListener();
+
+        function openAllCards() {
+            let imgArray = model.getArrayImages(puzzle.childNodes.length+1);
+            for (let i = 0; i < puzzle.childNodes.length; i++) {
+                //add picture
+                puzzle.childNodes[i].firstElementChild.lastElementChild.innerHTML ="<img class='back_img' alt="+imgArray[i]+" src="+"img\\"+imgArray[i]+" />";
+                puzzle.childNodes[i].firstElementChild.className += " rotated";
+            }
+        }
+        function closeAllCards() {
+            for (let i = 0; i < puzzle.childNodes.length; i++) {
+                puzzle.childNodes[i].firstElementChild.className = "block";
+            }
+        }
+    },
     //hide the card from the screen
     hiddenCard: function () {
 
@@ -29,23 +73,22 @@ let view = {
 /*      controller      */
 let controller = {
 
-    createField: function (v) {
+    createField: function (color) {
         switch (document.getElementById('select_field').value) {
             case "6 Pairs":
-                view.createCards(12, "160", v);
+                view.createCards(12, "160", color);
                 break;
             case "8 Pairs":
-                view.createCards(16, "160", v);
+                view.createCards(16, "160", color);
                 break;
             case "10 Pairs":
-                view.createCards(20, "128", v);
+                view.createCards(20, "128", color);
                 break;
             case "12 Pairs":
-                view.createCards(24, "106", v);
+                view.createCards(24, "106", color);
                 break;
             default:
         }
-        controller.setListener();
     },
 
     //set listener for all cards
@@ -87,13 +130,17 @@ let controller = {
         },
 
         event: function () {
-            document.getElementById("submitColor").addEventListener("click", controller.setColor, false);
             controller.createField(document.getElementById("color").value);
-
+            //set new color
+            document.getElementById("submitColor").addEventListener("click", controller.setColor, false);
+            //create a new size field
             let selectField = document.getElementById('select_field');
             selectField.onchange = function () {
                 controller.createField(document.getElementById("color").value);
             };
+            // button start game
+            document.getElementById("start").addEventListener("click",view.startGame,false);
+
         }
 
     };

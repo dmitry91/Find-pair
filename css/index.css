@@ -67,6 +67,10 @@
     background-color: #f3f3f3;
     -webkit-transform: rotateY(180deg);
 }
+.back_img{
+    width: 100%;
+    height: 100%;
+}
 .content_hidden_card{
     border: 1px solid white;
 }
@@ -75,4 +79,15 @@
     width: 250px;
     height: 500px;
     float: right;
+}
+.menu_btn_start {
+    transition-duration: 0.4s;
+    margin-top: 15px;
+    font-size: 24px;
+    padding: 6px 18px;
+}
+
+.menu_btn_start:hover {
+    background-color: #ae4749;
+    color: white;
 }
