@@ -1,5 +1,9 @@
 /*      model       */
 let model = {
+    //flag to lock cards
+    blockField: false,
+    selectedQueue: [],
+    statusGame:0,
     getArrayImages: function (l) {
         let files = ["chamomile.jpg", "dandelion.JPG", "eiffel_tower.jpg", "hare.jpg", "horse.jpg", "house.jpg",
             "lavra.jpg", "motorcycle.jpg", "ocean.jpg", "rottweiler.jpg", "sunset.jpg", "tesla.jpg"];
@@ -21,6 +25,48 @@ let model = {
             return a;
         }
     },
+    //verification of inverted cards
+    checkingForMatches: function (id) {
+        this.selectedQueue.push(id);
+        if (this.selectedQueue.length === 2) {
+            //At the same time, only two pictures can be turned upside down, we turn on the lock
+            this.blockField = true;
+            if(document.getElementById(this.selectedQueue[0]).firstElementChild.lastElementChild.lastElementChild.src ===
+                document.getElementById(this.selectedQueue[1]).firstElementChild.lastElementChild.lastElementChild.src){
+                //hidden use element
+                setTimeout(function () {
+                    view.hiddenCard(document.getElementById(model.selectedQueue[0]));
+                    view.hiddenCard(document.getElementById(model.selectedQueue[1]));
+                    model.selectedQueue = [];
+                    //the animation is over, the cards are removed, we remove the lock.
+                    model.blockField = false;
+                    model.openPears();//add one right result
+                },1000);
+                //remove listener
+                document.getElementById(this.selectedQueue[0]).removeEventListener('click', controller.rotateItem, false);
+                document.getElementById(this.selectedQueue[1]).removeEventListener('click', controller.rotateItem, false);
+            }
+            else {
+                setTimeout(function () {
+                    while (model.selectedQueue.length) {
+                        document.getElementById(model.selectedQueue.shift()).firstElementChild.className = "block";
+                    }
+                    model.blockField = false;//remove the lock
+                }, 1500);
+            }
+
+
+        }
+    },
+
+    openPears: function () {
+        this.statusGame++;
+        //have all pears game over
+        if (this.statusGame == document.getElementById('select_field').value[0]){
+            alert("you win");
+        }
+    }
+
 
 };
 
@@ -36,7 +82,7 @@ let view = {
             contentCard.style.width = size + "px";
             contentCard.style.height = size + "px";
             contentCard.id = "puzzle-" + (i + 1);
-            contentCard.innerHTML += "<div id='block' class='block'>" +
+            contentCard.innerHTML += "<div class='block'>" +
                 "<div class='front side' style='background-color:" + color + "'></div>" +
                 "<div class='back side'></div>" +
                 "</div>";
@@ -45,6 +91,8 @@ let view = {
     },
     startGame: function () {
         let puzzle = document.getElementById('puzzle');
+        controller.setColor();
+        model.statusGame = 0;
         //show all the pictures and then hide
         openAllCards();
         setTimeout(closeAllCards, 1500);
@@ -65,8 +113,11 @@ let view = {
         }
     },
     //hide the card from the screen
-    hiddenCard: function () {
-
+    hiddenCard: function (elem) {
+        elem.innerHTML = "<div class='block'>" +
+            "<div class='front side' style='background-color:white'></div>" +
+            "<div class='back side'></div>" +
+            "</div>";
     }
 };
 
@@ -93,18 +144,18 @@ let controller = {
 
     //set listener for all cards
     setListener: function () {
-        let myFunction = function () {
-            let attribute = this.getAttribute("id");
-            if (document.getElementById(attribute).firstElementChild.className === "block") {
-                document.getElementById(attribute).firstElementChild.className += " rotated";
-            }
-            else {
-                document.getElementById(attribute).firstElementChild.className = "block";
-            }
-        };
+
         let className = document.getElementsByClassName('content_card');
         for (let i = 0; i < className.length; i++) {
-            className[i].addEventListener('click', myFunction, false);
+            className[i].addEventListener('click', controller.rotateItem, false);
+        }
+    },
+    //invert the hidden element
+    rotateItem: function () {
+        let attribute = this.getAttribute("id");
+        if (document.getElementById(attribute).firstElementChild.className === "block" && document.getElementById(attribute).firstElementChild.className!=='' && !model.blockField) {
+            document.getElementById(attribute).firstElementChild.className += " rotated";
+            model.checkingForMatches(attribute);
         }
     },
 
