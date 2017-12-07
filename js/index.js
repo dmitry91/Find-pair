@@ -3,11 +3,12 @@ let model = {
     //flag to lock cards
     blockField: false,
     selectedQueue: [],
-    statusGame:0,
+    statusRightPears:0,
+    unAttempts:0, //unsuccessful attempts to choose
+    gameStart: false,
     getArrayImages: function (l) {
         let files = ["chamomile.jpg", "dandelion.JPG", "eiffel_tower.jpg", "hare.jpg", "horse.jpg", "house.jpg",
             "lavra.jpg", "motorcycle.jpg", "ocean.jpg", "rottweiler.jpg", "sunset.jpg", "tesla.jpg"];
-
         let result = shuffle(files);
         //separate the desired number of pictures
         result = result.slice(0, l / 2);
@@ -40,13 +41,15 @@ let model = {
                     model.selectedQueue = [];
                     //the animation is over, the cards are removed, we remove the lock.
                     model.blockField = false;
-                    model.openPears();//add one right result
+                    model.openRightPears();//add one right result
                 },1000);
                 //remove listener
                 document.getElementById(this.selectedQueue[0]).removeEventListener('click', controller.rotateItem, false);
                 document.getElementById(this.selectedQueue[1]).removeEventListener('click', controller.rotateItem, false);
             }
+            //wrong pair
             else {
+                this.unAttempts ++;
                 setTimeout(function () {
                     while (model.selectedQueue.length) {
                         document.getElementById(model.selectedQueue.shift()).firstElementChild.className = "block";
@@ -54,20 +57,92 @@ let model = {
                     model.blockField = false;//remove the lock
                 }, 1500);
             }
-
-
         }
     },
 
-    openPears: function () {
-        this.statusGame++;
+    openRightPears: function () {
+        this.statusRightPears++;
         //have all pears game over
-        if (this.statusGame == document.getElementById('select_field').value[0]){
-            alert("you win");
+        if (this.statusRightPears === parseInt(document.getElementById('select_field').value[0])) {
+            this.stopTimer();
+            this.gameStart = false;
+            let resultPoints = this.calculationPoints();
+            alert("you win, you have " + resultPoints + " pints");
+            let name = prompt("enter your name", "");
+            //save results
+            if (name !== "") {
+                let arrUsers = JSON.parse(localStorage.getItem(document.getElementById('select_field').value));//deserialize it
+                if (arrUsers === null) {
+                    arrUsers = [];
+                    arrUsers = changeArray(arrUsers, name, resultPoints);
+                    let serialObj = JSON.stringify(arrUsers); //serialize it
+                    localStorage.setItem(document.getElementById('select_field').value, serialObj);
+                } else {
+                    arrUsers = changeArray(arrUsers, name, resultPoints);
+                    let serialObj = JSON.stringify(arrUsers); //serialize it
+                    localStorage.setItem(document.getElementById('select_field').value, serialObj);
+                }
+            }
+            view.showStatistics();
+        }
+        function changeArray(arr, name, points) {
+            let date = new Date();
+            for (let i in arr) {
+                if (arr[i].name === name) {
+                    if (arr[i].points < points) {
+                        arr[i].points = points;
+                        arr[i].date = date.getDate()+"."+(date.getMonth()+1)+"."+date.getFullYear();
+                        return arr;
+                    }
+                    else {
+                        return arr;
+                    }
+                }
+            }
+            arr.push({name: name, points: points, date: date.getDate()+"."+(date.getMonth()+1)+"."+date.getFullYear()});
+            return arr;
+        }
+    },
+    startTimer: function () {
+        startTimer();
+    },
+    stopTimer: function () {
+        stopTimer();
+    },
+    pauseTimer: function () {
+        if (model.gameStart) {
+            onOfPauseTimer();
+        }
+    },
+    calculationPoints: function () {
+        let points = 20;
+        let min = parseInt(getMinute());
+        //consider points in the game, from the time and wrong attempts
+        switch (document.getElementById('select_field').value) {
+            case "6 Pairs":
+                points -= min;
+                points -= this.unAttempts;
+                break;
+            case "8 Pairs":
+                points -= (min / 2);
+                points -= (this.unAttempts / 2);
+                break;
+            case "10 Pairs":
+                points -= (min / 3);
+                points -= (this.unAttempts / 3);
+                break;
+            case "12 Pairs":
+                points -= (min / 4);
+                points -= (this.unAttempts / 4);
+                break;
+            default:
+        }
+        if (points > 0) {
+            return points;
+        } else {
+            return 1;
         }
     }
-
-
 };
 
 /*      view        */
@@ -88,15 +163,22 @@ let view = {
                 "</div>";
             puzzle.appendChild(contentCard);
         }
+        model.stopTimer();
+        model.gameStart = false;
     },
     startGame: function () {
+        view.showStatistics();
+        model.gameStart = true;
+        model.unAttempts = 0;
         let puzzle = document.getElementById('puzzle');
         controller.setColor();
-        model.statusGame = 0;
+        model.statusRightPears = 0;
+        model.blockField = false;
         //show all the pictures and then hide
         openAllCards();
         setTimeout(closeAllCards, 1500);
         controller.setListener();
+        model.startTimer();
 
         function openAllCards() {
             let imgArray = model.getArrayImages(puzzle.childNodes.length+1);
@@ -118,6 +200,28 @@ let view = {
             "<div class='front side' style='background-color:white'></div>" +
             "<div class='back side'></div>" +
             "</div>";
+    },
+    showStatistics: function () {
+        let tableRef = document.getElementById("user_points").getElementsByTagName("tbody")[0];
+        //clear table
+        while (tableRef.rows[1]) {
+            tableRef.deleteRow(1)
+        }
+        let arrUsers = JSON.parse(localStorage.getItem(document.getElementById('select_field').value));//deserialize it
+        if (arrUsers !== null) {
+            arrUsers.sort(function (a, b) {
+                return parseFloat(b.points) - parseFloat(a.points);
+            });
+            for (let i in arrUsers) {
+                let newRow = tableRef.insertRow(tableRef.rows.length);
+                let cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                let cell3 = newRow.insertCell(2);
+                cell1.appendChild(document.createTextNode(arrUsers[i].name));
+                cell2.appendChild(document.createTextNode(arrUsers[i].points));
+                cell3.appendChild(document.createTextNode(arrUsers[i].date));
+            }
+        }
     }
 };
 
@@ -125,6 +229,7 @@ let view = {
 let controller = {
 
     createField: function (color) {
+        view.showStatistics();
         switch (document.getElementById('select_field').value) {
             case "6 Pairs":
                 view.createCards(12, "160", color);
@@ -144,7 +249,6 @@ let controller = {
 
     //set listener for all cards
     setListener: function () {
-
         let className = document.getElementsByClassName('content_card');
         for (let i = 0; i < className.length; i++) {
             className[i].addEventListener('click', controller.rotateItem, false);
@@ -165,9 +269,7 @@ let controller = {
         for (let i = 0; i < arr.length; i++) {
             arr[i].style.backgroundColor = color;
         }
-
     }
-
 };
 
 (function () {
@@ -189,8 +291,9 @@ let controller = {
             selectField.onchange = function () {
                 controller.createField(document.getElementById("color").value);
             };
-            // button start game
-            document.getElementById("start").addEventListener("click",view.startGame,false);
+            // button startTimer game
+            document.getElementById("startBtn").addEventListener("click",view.startGame,false);
+            document.getElementById("pauseBtn").addEventListener("click",model.pauseTimer,false);
 
         }
 

@@ -37,11 +37,29 @@
                 </select>
             </label>
             <br/>
-            <button class="menu_btn_start" id="start">START</button>
+            <button class="menu_btn_start" id="startBtn">START</button>
+            <form name=formTimer id=formTimer>
+                <input class="formTimer_pauseBtn" type="button" id="pauseBtn" value="Пауза">
+                <br/>
+                <input class="formTimer_time" disabled name=stopwatch size=10 value="00:00:00"/>
+            </form>
+        </div>
+        <div class="statistics">
+            <h3 >Статистика:</h3>
+        <div class="userList">
+            <table class="userList_table" id="user_points">
+                <tr>
+                    <th>Name</th>
+                    <th>Points</th>
+                    <th>Date</th>
+                </tr>
+            </table>
+        </div>
         </div>
     </div>
 </div>
 
+<script src="js/timer.js"></script>
 <script src="js/index.js"></script>
 </body>
 </html>

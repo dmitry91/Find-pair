@@ -75,9 +75,8 @@
     border: 1px solid white;
 }
 .menu{
-    border: 1px solid gray;
     width: 250px;
-    height: 500px;
+    height: 250px;
     float: right;
 }
 .menu_btn_start {
@@ -90,4 +89,37 @@
 .menu_btn_start:hover {
     background-color: #ae4749;
     color: white;
+}
+.statistics{
+    float: right;
+}
+.userList{
+    width: 250px;
+    height: 400px;
+    overflow-x: auto;
+}
+.userList_table{
+    width: 250px;
+    border-collapse: collapse;
+}
+
+.userList_table caption{
+    font-size: 25px;
+}
+.userList_table th, caption{
+    text-align: left;
+}
+.userList_table td, th{
+    border-collapse: collapse;
+    border-bottom: 1px solid black;
+}
+.formTimer_pauseBtn{
+    font-size: 18px;
+    margin-top: 10px
+}
+.formTimer_time{
+    margin-top: 10px;
+    background: white;
+    border: hidden;
+    font-size: 25px
 }
